@@ -1,0 +1,108 @@
+
+#include <libvirt/libvirt.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void main()
+    {
+
+       int i,val=-1,choice,choice_id,nActive_domains;
+       int *active_domains;
+       char dom_name[50];
+       virConnectPtr cont;
+       virDomainPtr vdom;
+
+       cont = virConnectOpen("xen:///");
+
+       if (cont == NULL) {
+           fprintf(stderr, "Error while connectioning to XEN:///  \n");
+           exit(1);
+       }
+       else
+       {
+        
+        while(1)
+        {
+		//Finding Active Devices
+        nActive_domains=virConnectNumOfDomains(cont);
+        active_domains=malloc(sizeof(int) * nActive_domains);
+        nActive_domains = virConnectListDomains(cont, active_domains, nActive_domains);
+
+        printf("Active domain IDs : \n");
+        for (i = 0 ; i < nActive_domains ; i++) {
+            
+            printf("  %d\n", active_domains[i]);
+        }
+        
+        free(active_domains);
+
+        
+            
+            printf("1.Start\n2.Suspend\n3.Resume\n4.stop\n5.exit ");
+            scanf("%d",&choice);
+
+            
+        
+            switch(choice)
+            {
+            
+            
+            
+                // Domain Start
+                case 1:
+		               //val=virDomainCreate(vdom);
+		               system("sudo xm list");
+		               printf("\n Enter the domain name to begin \n");
+		               scanf("%s",dom_name);
+		               vdom=virDomainLookupByName(cont,dom_name);
+			           val=virDomainCreate(vdom);
+                       if(val==0)      
+                           printf("Completed\n");
+                       else
+                           printf("Failed\n");   
+                       break;
+                
+                //Domain Suspend 
+                case 2:
+                       
+                       printf("\n Please Insert the Active Domian ID \n");
+                       scanf("%d",&choice_id); 
+                       vdom=virDomainLookupByID(cont,choice_id);
+		               val=virDomainSuspend(vdom);
+                       if(val==0)
+                           printf("Completed\n");
+                       else
+                           printf("Failed\n");   
+                       break;
+               
+               // Domain Resume 
+                case 3:
+                
+                       printf("\n Please Insert the Active Domian ID \n");
+                       scanf("%d",&choice_id); 
+                       vdom=virDomainLookupByID(cont,choice_id);
+		               val=virDomainResume(vdom);
+                        if(val==0)                     
+                            printf("Completed\n");
+                        else
+                            printf("Failed\n");   
+                        break;
+               
+               // Domain stop 
+                case 4: 
+                
+                      printf("\n Please Insert the Active Domian ID \n");
+                      scanf("%d",&choice_id); 
+                      vdom=virDomainLookupByID(cont,choice_id);
+			          val=virDomainShutdown(vdom);
+                        if(val==0)                     
+                            printf("Completed\n");
+                        else
+                            printf("Failed\n");   
+                        break;
+                default:exit(1);
+            }
+        }
+        virConnectClose(cont);
+    }
+}
