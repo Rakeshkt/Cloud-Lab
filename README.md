@@ -2,7 +2,7 @@ Cloud-Lab
 =========
 
 
-C Program for Libvir
+C Program for Libvirt
 
 
 
